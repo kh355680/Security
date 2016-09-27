@@ -97,9 +97,20 @@ namespace Auth.Token.Controllers
         }
 
         [HttpDelete]
-        public IHttpActionResult Delete([FromUri]string id)
+        [Route("delete/{id}")]
+        public async Task<IHttpActionResult> Delete([FromUri]string id)
         {
-            return Ok();
+            var roleToDelete = await _roleManager.FindByIdAsync(id);
+
+            if (roleToDelete == null)
+                return BadRequest("Role Not Found with this Id");
+
+            var result = await _roleManager.DeleteAsync(roleToDelete);
+
+            if (!result.Succeeded)
+                return InternalServerError();
+
+            return Ok("Role Deleted");
         }
     }
 }
